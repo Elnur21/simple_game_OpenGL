@@ -45,7 +45,7 @@ is_player_animated = False
 # Car properties
 car_x = 4
 car_z = 0.5
-car_speed = 0.1
+car_speed = 0.2
 wheel_rotation = 0
 front_wheel_rotation = 0
 car_rotation=0
@@ -380,7 +380,6 @@ def draw_player():
 # to update and draw the scene
 def draw_scene():
     global is_daytime, light_ambient
-    # glColor3f(0.529, 0.808, 0.922)
     if is_daytime:
         glClearColor(0.529, 0.808, 0.922, 1.0)  # Set clear color toblue as sky color
         light_ambient=(1.2, 1.2, 1.2, 10.0)
@@ -475,7 +474,6 @@ glEnable(GL_COLOR_MATERIAL)
 glEnable(GL_NORMALIZE)
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-# glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
 
 # Register callback functions for keyboard and mouse input
 glutKeyboardFunc(handle_key)
