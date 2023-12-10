@@ -379,12 +379,14 @@ def draw_player():
 
 # to update and draw the scene
 def draw_scene():
-    global is_daytime
+    global is_daytime, light_ambient
     # glColor3f(0.529, 0.808, 0.922)
     if is_daytime:
         glClearColor(0.529, 0.808, 0.922, 1.0)  # Set clear color toblue as sky color
+        light_ambient=(1.2, 1.2, 1.2, 10.0)
     else:
         glClearColor(0.0, 0.0, 0.0, 1.0)
+        light_ambient=(.2, .2, .2, 1.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     draw_ground()
 
