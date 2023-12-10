@@ -3,6 +3,10 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import cos, sin, pi
+import time
+
+toggle_timer = time.time()
+is_daytime = True
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
@@ -20,32 +24,30 @@ leg_angle = 0
 arm_direction = 1
 leg_direction = 1
 isPlayer = True
-# New: Variables for camera movement
+# camera movement
 camera_speed = 0.2
 yaw = 0
 pitch = 0
 
 player_x = 0
-player_y = 1  # Height of the player above the ground
+player_y = 1  # height of the player above the ground
 player_z = 5
 player_speed = 0.2
-
-
 is_player_animated = False
 
-car_x = 0.5
+car_x = 4
 car_z = 0.5
 car_speed = 0.1
 wheel_rotation = 0
 front_wheel_rotation = 0
 car_rotation=0
 
-is_daytime = True
 clouds = []
 stars=[]
+
 def generate_stars():
     global stars
-    for _ in range(50):
+    while len(stars)<20:
         x = random.uniform(-10, 10)
         y = random.uniform(5, 15)
         z = random.uniform(-10, 10)
@@ -71,7 +73,7 @@ def draw_clouds():
     generate_clouds()
     glColor4f(1.0, 1.0, 1.0, 0.1)  # Semi-transparent white for clouds
     for cloud in clouds:
-        draw_sphere(cloud[0], cloud[1], cloud[2], radius=1.5, color=(1.0, 1.0, 1.0))
+        draw_sphere(cloud[0], cloud[1], cloud[2], radius=1.5, color=(0.2, 0.2, 1.0))
 
 
 def draw_car():
@@ -81,6 +83,16 @@ def draw_car():
     glRotatef(car_rotation, 0, 1, 0)
     draw_cube(car_x-0.7, 0.5, car_z+0.3, 1.5, 0.5, 0.8, color=(0.5, 0.5, 0.5))
     glShadeModel(GL_FLAT)
+
+    # Draw front LEDs (white)
+    draw_cube(car_x + 0.8, 0.6, car_z + 0.2, 0.05, 0.05, 0.05, color=(1.0, 1.0, 1.0))  # White LED
+    draw_cube(car_x + 0.8, 0.6, car_z - 0.2, 0.05, 0.05, 0.05, color=(1.0, 1.0, 1.0))  # White LED
+
+    # Draw rear LEDs (red)
+    draw_cube(car_x - 0.75, 0.6, car_z + 0.2, 0.05, 0.05, 0.05, color=(1.0, 0.0, 0.0))  # Red LED
+    draw_cube(car_x - 0.75, 0.6, car_z - 0.2, 0.05, 0.05, 0.05, color=(1.0, 0.0, 0.0))  # Red LED
+
+    
     # Draw wheels with clear division between black and white halves
     wheel_radius = 0.25
     wheel_thickness = 0.1
@@ -102,7 +114,7 @@ def draw_car():
 
         glPopMatrix()
 
-     # Draw front left wheel with rotation
+     # Draw rear left wheel
     draw_half_torus(car_x - 0.6, 0.25, car_z + 0.4, wheel_rotation, 0, (0, 0, 0), (1, 1, 1))
 
     # Draw front right wheel with rotation
@@ -111,7 +123,7 @@ def draw_car():
     # Draw rear left wheel
     draw_half_torus(car_x - 0.6, 0.25, car_z - 0.5, wheel_rotation, 0, (0, 0, 0), (1, 1, 1))
 
-    # Draw rear right wheel
+    # Draw front right wheel with rotation
     draw_half_torus(car_x + 0.6, 0.25, car_z - 0.5, wheel_rotation, front_wheel_rotation, (0, 0, 0), (1, 1, 1))
 
 
@@ -179,7 +191,7 @@ def handle_key_up(key, x, y):
     is_player_animated = False
 
 def handle_mouse(button, state, x, y):
-    # New: Handle mouse interaction (rotation and player movement)
+    # handle mouse interaction (rotation and player movement)
     global yaw, pitch
     global player_x, player_z
 
@@ -191,7 +203,7 @@ def handle_mouse(button, state, x, y):
         glutPostRedisplay()
 
 def handle_motion(x, y):
-    # New: Update yaw and pitch based on mouse movement
+    # update yaw and pitch based on mouse movement
     global yaw, pitch
     yaw += (x - WINDOW_WIDTH // 2) * 0.1
     pitch += (y - WINDOW_HEIGHT // 2) * 0.1
@@ -283,18 +295,18 @@ def draw_player():
 
     # Draw eyes
     glColor3f(0.0, 0.0, 0.0)
-    draw_sphere(player_x - 0.03, player_y + 0.52, player_z + 0.05, radius=0.02, color=(0.0, 0.0, 0.0))
-    draw_sphere(player_x + 0.03, player_y + 0.52, player_z + 0.05, radius=0.02, color=(0.0, 0.0, 0.0))
+    draw_sphere(player_x - 0.03, player_y + 0.52, player_z , radius=0.02, color=(0.0, 0.0, 0.0))
+    draw_sphere(player_x + 0.03, player_y + 0.52, player_z , radius=0.02, color=(0.0, 0.0, 0.0))
 
     # Draw mouth
-    glColor3f(1.0, 0.0, 0.0)
+    glColor3f(0.0, 0.0, 0.0)
     glBegin(GL_LINES)
-    glVertex3f(player_x - 0.03, player_y + 0.48, player_z - 0.1)
-    glVertex3f(player_x + 0.03, player_y + 0.48, player_z - 0.1)
+    glVertex3f(player_x - 0.03, player_y + 0.48, player_z)
+    glVertex3f(player_x + 0.03, player_y + 0.48, player_z)
     glEnd()
 
     # Draw body
-    draw_cube(player_x - 0.1, player_y, player_z - 0.05, 0.2, 0.4, 0.1, color=(0.0, 1.0, 0.0))
+    draw_cube(player_x - 0.1, player_y, player_z - 0.05, 0.2, 0.4, 0.1, color=(0.0, 1.0, 1.0))
     if is_player_animated:
         arm_angle += arm_direction * 5  # Adjust the speed of arm movement
         if arm_angle > 30 or arm_angle < -30:
@@ -399,6 +411,7 @@ def update_car(back):
     wheel_rotation += (360 * car_speed) / (2 * pi * 0.25)  # circumference = 2 * pi * radius
 
 def display():
+    global toggle_timer, is_daytime
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
@@ -408,6 +421,12 @@ def display():
               0, 1, 0)
 
     setup_lighting()
+
+    if time.time() - toggle_timer > 10:
+        is_daytime = not is_daytime  # Toggle the day/night cycle
+        toggle_timer = time.time()  # Reset the timer
+
+
     draw_scene()
 
     # Draw the car
@@ -425,6 +444,7 @@ glEnable(GL_COLOR_MATERIAL)
 glEnable(GL_NORMALIZE)
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
 # Register callback functions for keyboard and mouse input
 glutKeyboardFunc(handle_key)
 glutSpecialFunc(handle_special_key)
